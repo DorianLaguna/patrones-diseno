@@ -30,7 +30,7 @@ import { COLORS } from '../helpers/colors.ts';
     .where("country = 'Cri'")
     .orderBy("name", "ASC")
     .limit(10)
-    .execute();
+    .execute();  
 
   console.log('Consulta: ', usersQuery);
   // Select id, name, email from users where age > 18 and country = 'Cri' order by name ASC limit 10;
@@ -50,24 +50,65 @@ class QueryBuilder {
   }
 
   select(...fields: string[]): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.fields = fields;
+    return this;
   }
 
   where(condition: string): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.conditions.push(condition);
+    return this;
   }
 
   orderBy(field: string, direction: 'ASC' | 'DESC' = 'ASC'): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.orderFields.push(field);
+    this.orderFields.push(direction)
+    return this
   }
 
   limit(count: number): QueryBuilder {
-    throw new Error('Method not implemented.');
+    this.limitCount = count;
+    return this;
   }
 
   execute(): string {
     // Select id, name, email from users where age > 18 and country = 'Cri' order by name ASC limit 10;
-    throw new Error('Method not implemented.');
+    let query = 'Select ';
+    //add fields choosen
+    
+    const fields = this.fields.join(', ')
+
+    query += fields
+    query += ' ';
+    
+    //add table
+    query += 'from ' + this.table + ' ';
+
+    //add conditions
+    if(this.conditions){
+      query += 'where'
+      this.conditions.forEach(condition => {
+        query += ` ${condition} AND`
+      })
+      query = query.slice(0, -4);
+    }
+
+    //add order
+    if(this.orderFields){
+      query += ' order by '
+      query += this.orderFields[0];
+      query += ' '
+      query += this.orderFields[1];
+      query += ' '
+    }
+    
+    if(this.limitCount){
+      query += 'limit ' + this.limitCount
+    }
+
+    query += ';'
+
+    //add limit
+    return query
   }
 }
 
